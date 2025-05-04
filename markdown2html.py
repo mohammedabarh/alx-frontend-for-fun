@@ -7,110 +7,140 @@ import os
 import re
 import hashlib
 
-def convert_markdown_to_html(input_file, output_file):
-    """Converts markdown file to HTML file"""
+
+def convert_headings(line):
+    """Convert markdown headings to HTML"""
+    pattern = r'^(#{1,6})\s(.+)$'
+    match = re.match(pattern, line)
+    if match:
+        level = len(match.group(1))
+        return f'<h{level}>{match.group(2)}</h{level}>\n'
+    return line
+
+
+def convert_md5(text):
+    """Convert text in [[]] to MD5 hash"""
+    pattern = r'\[\[(.+?)\]\]'
     
-    # Check if input file exists
-    if not os.path.exists(input_file):
+    def md5_replace(match):
+        content = match.group(1)
+        return hashlib.md5(content.encode()).hexdigest()
+    
+    return re.sub(pattern, md5_replace, text)
+
+
+def remove_c(text):
+    """Remove all 'c' characters from text in (())"""
+    pattern = r'\(\((.+?)\)\)'
+    
+    def c_remove(match):
+        content = match.group(1)
+        return ''.join(c for c in content if c.lower() != 'c')
+    
+    return re.sub(pattern, c_remove, text)
+
+
+def convert_emphasis(text):
+    """Convert markdown emphasis to HTML"""
+    text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
+    text = re.sub(r'__(.+?)__', r'<em>\1</em>', text)
+    return text
+
+
+def process_markdown(input_file, output_file):
+    """Process markdown file and convert to HTML"""
+    try:
+        with open(input_file, 'r') as f:
+            lines = f.readlines()
+    except FileNotFoundError:
         print(f"Missing {input_file}", file=sys.stderr)
         sys.exit(1)
 
-    # Read markdown content
-    with open(input_file, 'r') as f:
-        content = f.read()
+    html_lines = []
+    current_list = []
+    list_type = None
+    in_paragraph = False
 
-    # Convert headings
-    for i in range(6, 0, -1):
-        pattern = f"^{'#' * i} (.+)$"
-        content = re.sub(pattern, f"<h{i}>\\1</h{i}>", content, flags=re.MULTILINE)
+    for line in lines:
+        line = line.rstrip()
+        
+        # Process special syntax first
+        line = convert_md5(line)
+        line = remove_c(line)
+        line = convert_emphasis(line)
 
-    # Convert unordered lists
-    content = convert_lists(content, "-", "ul")
-    
-    # Convert ordered lists
-    content = convert_lists(content, "*", "ol")
+        # Handle headings
+        if line.startswith('#'):
+            if in_paragraph:
+                html_lines.append('</p>')
+                in_paragraph = False
+            if current_list:
+                html_lines.append(f'</{list_type}>')
+                current_list = []
+            html_lines.append(convert_headings(line))
+            continue
 
-    # Convert paragraphs and line breaks
-    content = convert_paragraphs(content)
+        # Handle lists
+        if line.startswith('- ') or line.startswith('* '):
+            if in_paragraph:
+                html_lines.append('</p>')
+                in_paragraph = False
 
-    # Convert bold and emphasis text
-    content = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', content)
-    content = re.sub(r'__(.+?)__', r'<em>\1</em>', content)
+            new_list_type = 'ul' if line.startswith('- ') else 'ol'
+            list_item = line[2:].strip()
 
-    # Convert MD5 brackets
-    content = convert_md5_brackets(content)
+            if not current_list:
+                list_type = new_list_type
+                html_lines.append(f'<{list_type}>')
+            elif list_type != new_list_type:
+                html_lines.append(f'</{list_type}>')
+                list_type = new_list_type
+                html_lines.append(f'<{list_type}>')
 
-    # Convert special parentheses
-    content = convert_special_parentheses(content)
+            html_lines.append(f'<li>{list_item}</li>')
+            current_list.append(list_item)
+            continue
+
+        # Close list if line is not a list item
+        if current_list and not (line.startswith('- ') or line.startswith('* ')):
+            html_lines.append(f'</{list_type}>')
+            current_list = []
+            list_type = None
+
+        # Handle paragraphs
+        if line.strip():
+            if not in_paragraph:
+                html_lines.append('<p>')
+                in_paragraph = True
+            else:
+                html_lines.append('<br/>')
+            html_lines.append(line)
+        elif in_paragraph:
+            html_lines.append('</p>')
+            in_paragraph = False
+
+    # Close any open tags
+    if current_list:
+        html_lines.append(f'</{list_type}>')
+    if in_paragraph:
+        html_lines.append('</p>')
 
     # Write to output file
-    with open(output_file, 'w') as f:
-        f.write(content)
+    try:
+        with open(output_file, 'w') as f:
+            f.write('\n'.join(html_lines))
+    except Exception as e:
+        print(f"Error writing to {output_file}: {e}", file=sys.stderr)
+        sys.exit(1)
 
-def convert_lists(content, marker, list_type):
-    """Converts markdown lists to HTML lists"""
-    lines = content.split('\n')
-    in_list = False
-    result = []
-    
-    for line in lines:
-        if line.startswith(f"{marker} "):
-            if not in_list:
-                result.append(f"<{list_type}>")
-                in_list = True
-            item = line[2:]
-            result.append(f"<li>{item}</li>")
-        else:
-            if in_list:
-                result.append(f"</{list_type}>")
-                in_list = False
-            result.append(line)
-    
-    if in_list:
-        result.append(f"</{list_type}>")
-    
-    return '\n'.join(result)
-
-def convert_paragraphs(content):
-    """Converts markdown paragraphs to HTML paragraphs"""
-    paragraphs = content.split('\n\n')
-    result = []
-    
-    for p in paragraphs:
-        if p.strip() and not p.startswith(('<h', '<ul', '<ol')):
-            lines = p.split('\n')
-            if len(lines) > 1:
-                p = '<br/>\n'.join(lines)
-            result.append(f"<p>\n{p}\n</p>")
-        else:
-            result.append(p)
-    
-    return '\n'.join(result)
-
-def convert_md5_brackets(content):
-    """Converts [[text]] to MD5 hash"""
-    def md5_replace(match):
-        text = match.group(1)
-        return hashlib.md5(text.encode()).hexdigest()
-    
-    return re.sub(r'\[\[(.+?)\]\]', md5_replace, content)
-
-def convert_special_parentheses(content):
-    """Converts ((text)) by removing all 'c' characters"""
-    def remove_c(match):
-        text = match.group(1)
-        return text.replace('c', '').replace('C', '')
-    
-    return re.sub(r'\(\((.+?)\)\)', remove_c, content)
 
 if __name__ == "__main__":
-    # Check arguments
-    if len(sys.argv) < 3:
+    if len(sys.argv) != 3:
         print("Usage: ./markdown2html.py README.md README.html", file=sys.stderr)
         sys.exit(1)
 
     input_file = sys.argv[1]
     output_file = sys.argv[2]
 
-    convert_markdown_to_html(input_file, output_file)
+    process_markdown(input_file, output_file)
     sys.exit(0)

@@ -1,24 +1,7 @@
-/* Sorts $list_to_sort and debug prints sorted list */
+/* Sorts $list_to_sort and prints the sorted list in the debug output */
 $list_to_sort: john anna zoe kim felicia carrie;
 
-/* Manual sort using bubble sort since Sass 3.7.4 doesn't have sort() */
-@function sort-list($list) {
-  $list-length: length($list);
-  $sorted-list: $list;
-  @for $i from 1 through $list-length {
-    @for $j from 1 through ($list-length - 1) {
-      $a: nth($sorted-list, $j);
-      $b: nth($sorted-list, $j + 1);
-      @if str-slice($a, 1) > str-slice($b, 1) {
-        $sorted-list: set-nth($sorted-list, $j, $b);
-        $sorted-list: set-nth($sorted-list, $j + 1, $a);
-      }
-    }
-  }
-  @return $sorted-list;
-}
-
-// Helper function to replace nth item (not built-in in Sass 3.7)
+// Helper function: set-nth
 @function set-nth($list, $n, $value) {
   $result: ();
   @for $i from 1 through length($list) {
@@ -29,6 +12,25 @@ $list_to_sort: john anna zoe kim felicia carrie;
     }
   }
   @return $result;
+}
+
+// Bubble sort for strings (lexicographical order)
+@function sort-list($list) {
+  $len: length($list);
+  $sorted: $list;
+  @for $i from 1 through $len {
+    @for $j from 1 through ($len - 1) {
+      $a: nth($sorted, $j);
+      $b: nth($sorted, $j + 1);
+      @if str-insert("", 1, 1) != "" { // Sass workaround to avoid warning
+      }
+      @if $a > $b {
+        $sorted: set-nth($sorted, $j, $b);
+        $sorted: set-nth($sorted, $j + 1, $a);
+      }
+    }
+  }
+  @return $sorted;
 }
 
 @debug sort-list($list_to_sort);

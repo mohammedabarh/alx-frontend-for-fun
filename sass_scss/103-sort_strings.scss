@@ -1,7 +1,35 @@
-/* Write a Sass file that sorts the variable 
+/* Write a Sass file that sorts the variable
 $list_to_sort and prints the sorted list in the debug output.
  */
+$list_to_sort: john anna zoe kim felicia carrie;
 
-@import '103-sort_list';
+@function set-nth($list, $n, $value) {
+  $result: ();
+  @for $i from 1 through length($list) {
+    @if $i == $n {
+      $result: append($result, $value);
+    } @else {
+      $result: append($result, nth($list, $i));
+    }
+  }
+  @return $result;
+}
 
-@debug $list_to_sort;
+@function sort-list($list) {
+  $len: length($list);
+  $sorted: $list;
+  @for $i from 1 through $len {
+    @for $j from 1 through ($len - 1) {
+      $a: nth($sorted, $j);
+      $b: nth($sorted, $j + 1);
+      @if $a > $b {
+        $temp: $a;
+        $sorted: set-nth($sorted, $j, $b);
+        $sorted: set-nth($sorted, $j + 1, $temp);
+      }
+    }
+  }
+  @return $sorted;
+}
+
+@debug sort-list($list_to_sort);

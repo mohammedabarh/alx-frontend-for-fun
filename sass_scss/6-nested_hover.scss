@@ -1,8 +1,10 @@
-/* Text color #FF0000 to button, #00FF00 on hover, using nested declarations */
-button {
-  color: #FF0000;
+/* Nested hover
+change button color on hover */
 
-  &:hover {
-    color: #00FF00;
-  }
+button {
+    color: #FF0000;
+
+    &:hover {
+        color: #00FF00;
+    }
 }

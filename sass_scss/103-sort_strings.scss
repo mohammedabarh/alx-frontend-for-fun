@@ -1,36 +1,5 @@
-/* Sorts $list_to_sort and prints the sorted list in the debug output */
-$list_to_sort: john anna zoe kim felicia carrie;
+/* Sorts the variable $list_to_sort and prints the sorted list in the debug output */
 
-// Helper function: set-nth
-@function set-nth($list, $n, $value) {
-  $result: ();
-  @for $i from 1 through length($list) {
-    @if $i == $n {
-      $result: append($result, $value);
-    } @else {
-      $result: append($result, nth($list, $i));
-    }
-  }
-  @return $result;
-}
+@import '103-sort_list';
 
-// Bubble sort for strings (lexicographical order)
-@function sort-list($list) {
-  $len: length($list);
-  $sorted: $list;
-  @for $i from 1 through $len {
-    @for $j from 1 through ($len - 1) {
-      $a: nth($sorted, $j);
-      $b: nth($sorted, $j + 1);
-      @if str-insert("", 1, 1) != "" { // Sass workaround to avoid warning
-      }
-      @if $a > $b {
-        $sorted: set-nth($sorted, $j, $b);
-        $sorted: set-nth($sorted, $j + 1, $a);
-      }
-    }
-  }
-  @return $sorted;
-}
-
-@debug sort-list($list_to_sort);
+@debug $list_to_sort;

@@ -1,0 +1,14 @@
+/* Imports colors and assigns them to .red/.green/.blue */
+@import '10-colors';
+
+.red {
+  color: $red;
+}
+
+.green {
+  color: $green;
+}
+
+.blue {
+  color: $blue;
+}

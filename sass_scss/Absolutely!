@@ -1,0 +1,349 @@
+lways debugging!
+**File:** `0-debug_log.scss`
+```scss
+/* Prints Hello world in the debug output */
+@debug "Hello world";
+```
+
+---
+
+### 1. Color variable
+**File:** `1-color_variable.scss`
+```scss
+/* Assigns text color #3D3D3D to body and p using a variable */
+$main-text-color: #3D3D3D;
+
+body {
+  color: $main-text-color;
+}
+
+p {
+  color: $main-text-color;
+}
+```
+
+---
+
+### 2. Colors
+**File:** `2-color_variables.scss`
+```scss
+/* Assigns text and background colors using variables */
+$main-text-color: #3D3D3D;
+$main-bg-color: #6D6D6D;
+
+body {
+  color: $main-text-color;
+  background-color: $main-bg-color;
+}
+
+p {
+  color: $main-text-color;
+}
+
+h2 {
+  background-color: $main-bg-color;
+}
+```
+
+---
+
+### 3. Nested tag
+**File:** `3-nested_tag.scss`
+```scss
+/* No margin/padding in body, margin 10px to p inside body */
+body {
+  margin: 0px;
+  padding: 0px;
+
+  p {
+    margin: 10px;
+  }
+}
+```
+
+---
+
+### 4. Nested class
+**File:** `4-nested_class.scss`
+```scss
+/* Text color #3D3D3D to body, #FF0000 to .red in body */
+body {
+  color: #3D3D3D;
+
+  .red {
+    color: #FF0000;
+  }
+}
+```
+
+---
+
+### 5. Nested child
+**File:** `5-nested_child.scss`
+```scss
+/* #3D3D3D to body, #FF0000 to direct .red children of body */
+body {
+  color: #3D3D3D;
+
+  > .red {
+    color: #FF0000;
+  }
+}
+```
+
+---
+
+### 6. Nested hover
+**File:** `6-nested_hover.scss`
+```scss
+/* #FF0000 to button, #00FF00 on hover */
+button {
+  color: #FF0000;
+
+  &:hover {
+    color: #00FF00;
+  }
+}
+```
+
+---
+
+### 7. Nested and nested again
+**File:** `7-nested_deeper.scss`
+```scss
+/* Font size 14px body, 16px h1 in body, 12px for h1.smaller in body */
+body {
+  font-size: 14px;
+
+  h1 {
+    font-size: 16px;
+
+    &.smaller {
+      font-size: 12px;
+    }
+  }
+}
+```
+
+---
+
+### 8. Margin mixin
+**File:** `8-mixin_margins.scss`
+```scss
+/* Mixin for margin left/right, used for body and div */
+@mixin margin-x($val) {
+  margin-left: $val;
+  margin-right: $val;
+}
+
+body {
+  @include margin-x(10px);
+}
+
+div {
+  @include margin-x(15px);
+}
+```
+
+---
+
+### 9. Extended
+**File:** `9-extend_list.scss`
+```scss
+/* .info font-size 12px, .success/.warning extend info with colors */
+.info {
+  font-size: 12px;
+}
+
+.success {
+  @extend .info;
+  color: #00FF00;
+}
+
+.warning {
+  @extend .info;
+  color: #FF0000;
+}
+```
+
+---
+
+### 10. Import colors
+**File:** `10-import_colors.scss`
+```scss
+/* Imports colors and assigns them to .red/.green/.blue */
+@import '10-colors';
+
+.red {
+  color: $red;
+}
+
+.green {
+  color: $green;
+}
+
+.blue {
+  color: $blue;
+}
+```
+> **Note:** Place your provided `10-colors.scss` in the same directory.
+
+---
+
+### 11. For each
+**File:** `11-loop_photos.scss`
+```scss
+/* Loop: creates .photo-NAME with background image */
+@import '11-photos';
+
+@each $name in $list-names {
+  .photo-#{$name} {
+    background: image-url("photos/#{$name}.jpg") no-repeat;
+  }
+}
+```
+> **Note:** Place your provided `11-photos.scss` in the same directory.
+
+---
+
+### 12. Loop Headers
+**File:** `12-loop_header.scss`
+```scss
+/* For loop: creates h1-h5 with font-size in px */
+@for $i from 1 through 5 {
+  h#{$i} {
+    font-size: #{$i}px;
+  }
+}
+```
+
+---
+
+### 13. Columns and operators
+**File:** `100-loop_col.scss`
+```scss
+/* For loop: creates .col-1 to .col-4 with calculated width */
+@for $i from 1 through 4 {
+  .col-#{$i} {
+    width: #{100% / $i};
+  }
+}
+```
+
+---
+
+### 14. Media query #0
+**File:** `101-media_query.scss`
+```scss
+/* Font size 20px for h1, 14px when < 320px */
+h1 {
+  font-size: 20px;
+}
+
+@media screen and (max-width: 320px) {
+  h1 {
+    font-size: 14px;
+  }
+}
+```
+
+---
+
+### 15. Media query #1
+**File:** `102-media_query.scss`
+```scss
+/* Font size for h1 at breakpoints, color for h1.small at <320px */
+h1 {
+  font-size: 20px;
+}
+
+@media screen and (max-width: 960px) {
+  h1 {
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  h1 {
+    font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  h1 {
+    font-size: 14px;
+  }
+  h1.small {
+    color: #1D1D1D;
+  }
+}
+```
+
+---
+
+### 16. Sort!
+**File:** `103-sort_strings.scss`
+```scss
+/* Sorts $list_to_sort and debug prints sorted list */
+$list_to_sort: john anna zoe kim felicia carrie;
+
+/* Manual sort using bubble sort since Sass 3.7.4 doesn't have sort() */
+@function sort-list($list) {
+  $list-length: length($list);
+  $sorted-list: $list;
+  @for $i from 1 through $list-length {
+    @for $j from 1 through ($list-length - 1) {
+      $a: nth($sorted-list, $j);
+      $b: nth($sorted-list, $j + 1);
+      @if str-slice($a, 1) > str-slice($b, 1) {
+        $sorted-list: set-nth($sorted-list, $j, $b);
+        $sorted-list: set-nth($sorted-list, $j + 1, $a);
+      }
+    }
+  }
+  @return $sorted-list;
+}
+
+// Helper function to replace nth item (not built-in in Sass 3.7)
+@function set-nth($list, $n, $value) {
+  $result: ();
+  @for $i from 1 through length($list) {
+    @if $i == $n {
+      $result: append($result, $value);
+    } @else {
+      $result: append($result, nth($list, $i));
+    }
+  }
+  @return $result;
+}
+
+@debug sort-list($list_to_sort);
+```
+
+---
+
+## README.md (Mandatory)
+**File:** `README.md`
+
+```markdown
+# Sass & Scss Tasks
+
+This project contains solutions for ALX "Sass & Scss" advanced tasks.
+
+## Requirements
+
+- Ubuntu 18.04 LTS
+- Sass 3.7.4+
+- All SCSS files start with a comment describing the task.
+- See individual `.scss` files for usage.
+
+## Files
+
+- Each task is in its own `.scss` file as specified.
+- See each file for more details.
+```
+
+---
+
+**If you need any explanation of the files, or want help with testing/compiling, let me know!*
+

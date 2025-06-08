@@ -1,0 +1,8 @@
+/* #FF0000 to button, #00FF00 on hover */
+button {
+  color: #FF0000;
+
+  &:hover {
+    color: #00FF00;
+  }
+}

@@ -1,0 +1,6 @@
+/* For loop: creates .col-1 to .col-4 with calculated width */
+@for $i from 1 through 4 {
+  .col-#{$i} {
+    width: #{100% / $i};
+  }
+}

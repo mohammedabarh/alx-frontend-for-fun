@@ -1,0 +1,13 @@
+/* Mixin for margin left/right, used for body and div */
+@mixin margin-x($val) {
+  margin-left: $val;
+  margin-right: $val;
+}
+
+body {
+  @include margin-x(10px);
+}
+
+div {
+  @include margin-x(15px);
+}

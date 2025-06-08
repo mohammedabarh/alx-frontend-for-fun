@@ -1,0 +1,34 @@
+/* Sorts $list_to_sort and debug prints sorted list */
+$list_to_sort: john anna zoe kim felicia carrie;
+
+/* Manual sort using bubble sort since Sass 3.7.4 doesn't have sort() */
+@function sort-list($list) {
+  $list-length: length($list);
+  $sorted-list: $list;
+  @for $i from 1 through $list-length {
+    @for $j from 1 through ($list-length - 1) {
+      $a: nth($sorted-list, $j);
+      $b: nth($sorted-list, $j + 1);
+      @if str-slice($a, 1) > str-slice($b, 1) {
+        $sorted-list: set-nth($sorted-list, $j, $b);
+        $sorted-list: set-nth($sorted-list, $j + 1, $a);
+      }
+    }
+  }
+  @return $sorted-list;
+}
+
+// Helper function to replace nth item (not built-in in Sass 3.7)
+@function set-nth($list, $n, $value) {
+  $result: ();
+  @for $i from 1 through length($list) {
+    @if $i == $n {
+      $result: append($result, $value);
+    } @else {
+      $result: append($result, nth($list, $i));
+    }
+  }
+  @return $result;
+}
+
+@debug sort-list($list_to_sort);

@@ -1,6 +1,32 @@
-/* Sort Sass list and print it in debug output */
-$list_to_sort: john anna zoe kim felicia carrie;
+/* Sort strings */
+@import '103-sort_list';
 
-$sorted_list: sort($list_to_sort);
+// Create a function to sort the list
+@function sort($list) {
+    $sorted-list: ();
+    @while length($list) > 0 {
+        $min: nth($list, 1);
+        @each $item in $list {
+            @if $item < $min {
+                $min: $item;
+            }
+        }
+        $sorted-list: append($sorted-list, $min, space);
+        $list: list-remove($list, index($list, $min));
+    }
+    @return $sorted-list;
+}
 
-@debug $sorted_list;
+// Function to remove item from list
+@function list-remove($list, $index) {
+    $result: ();
+    @for $i from 1 through length($list) {
+        @if $i != $index {
+            $result: append($result, nth($list, $i), space);
+        }
+    }
+    @return $result;
+}
+
+// Debug the sorted list
+@debug sort($list_to_sort);
